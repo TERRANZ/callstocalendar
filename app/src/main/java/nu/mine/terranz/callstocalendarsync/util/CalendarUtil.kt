@@ -87,12 +87,12 @@ class CalendarUtil(private var context: Context) {
             val cr = context.contentResolver
             val values = ContentValues()
             val calendarId = sp.getLong(CAL_ID, 1L)
-            val len = phoneCall.length / 1000
+            val len = phoneCall.length
             val descFull =
                 descr + " вызов, от: " + phoneCall.number + " (" + getContactName(phoneCall.number) + ") длительностью: " + len + " секунд"
 
             values.put(CalendarContract.Events.DTSTART, phoneCall.startDate)
-            values.put(CalendarContract.Events.DTEND, phoneCall.startDate + phoneCall.length)
+            values.put(CalendarContract.Events.DTEND, phoneCall.startDate + phoneCall.length * 1000)
             values.put(
                 CalendarContract.Events.TITLE,
                 descr + " " + context.getString(R.string.call)
