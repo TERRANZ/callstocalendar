@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.preference.PreferenceManager
 import android.provider.CallLog
 import android.util.Log
+import android.widget.Toast
 import nu.mine.terranz.callstocalendarsync.entity.PhoneCall
 import java.util.*
 import kotlin.collections.ArrayList
@@ -13,7 +14,7 @@ import kotlin.collections.ArrayList
 class CallsUtil {
 
     fun doSync(context: Context?) {
-        Log.i(this.javaClass.name, "Starting sync");
+        Log.i(this.javaClass.name, "Starting sync")
         val celendarUtil = context?.let {
             CalendarUtil(
                 it
@@ -26,7 +27,12 @@ class CallsUtil {
                 context,
                 sp.getLong("last_sync", Calendar.getInstance().timeInMillis - 60 * 60 * 1000)
             )
-            Log.i(this.javaClass.name, "Received " + calls.size + " new calls to process");
+            Log.i(this.javaClass.name, "Received " + calls.size + " new calls to process")
+            Toast.makeText(
+                context,
+                "Received " + calls.size + " new calls to process",
+                Toast.LENGTH_SHORT
+            ).show()
 
             calls.forEach { phoneCall: PhoneCall -> celendarUtil?.saveCallEvent(phoneCall) }
 
@@ -69,6 +75,6 @@ class CallsUtil {
             )
         }
         managedCursor.close()
-        return phoneCalls;
+        return phoneCalls
     }
 }

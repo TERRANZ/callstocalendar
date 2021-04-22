@@ -23,6 +23,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.a_main)
 
+        CalendarUtil(this).setupSyncAlarm()
+        CallsUtil().doSync(this)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             checkAndRequestPermissions()
 
@@ -45,9 +48,6 @@ class MainActivity : AppCompatActivity() {
         } catch (e: SecurityException) {
             Log.i(this.javaClass.name, "Get permissions firstly")
         }
-
-        CalendarUtil(this).setupSyncAlarm()
-        CallsUtil().doSync(this)
     }
 
     fun chooseCal(view: View) {
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.INTERNET,
                 Manifest.permission.RECEIVE_BOOT_COMPLETED
             )
-            ActivityCompat.requestPermissions(this, perms, 1);
+            ActivityCompat.requestPermissions(this, perms, 1)
         }
     }
 }

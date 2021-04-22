@@ -11,6 +11,7 @@ import android.preference.PreferenceManager
 import android.provider.CalendarContract
 import android.provider.Contacts
 import android.util.Log
+import android.widget.Toast
 import nu.mine.terranz.callstocalendarsync.R
 import nu.mine.terranz.callstocalendarsync.entity.PhoneCall
 import nu.mine.terranz.callstocalendarsync.receiver.SyncReceiver
@@ -23,6 +24,7 @@ class CalendarUtil(private var context: Context) {
     fun setupSyncAlarm() {
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, SyncReceiver::class.java).let { intent ->
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
             PendingIntent.getBroadcast(context, 0, intent, 0)
         }
 
@@ -37,7 +39,8 @@ class CalendarUtil(private var context: Context) {
             AlarmManager.INTERVAL_HOUR,
             alarmIntent
         )
-        Log.i(this.javaClass.name, "Alarm set");
+        Log.i(this.javaClass.name, "Alarm set")
+        Toast.makeText(context, "Calls list updater set", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -71,7 +74,7 @@ class CalendarUtil(private var context: Context) {
         val sp = PreferenceManager.getDefaultSharedPreferences(context)
 
         if (!checkCallEvent(phoneCall.genId())) {
-            Log.i(this.javaClass.name, "Saving new call event $phoneCall");
+            Log.i(this.javaClass.name, "Saving new call event $phoneCall")
             var descr = if (phoneCall.incoming) {
                 context.getString(R.string.in_call)
             } else {
@@ -108,7 +111,7 @@ class CalendarUtil(private var context: Context) {
 
     fun checkCallEvent(id: Int): Boolean {
         val cr = context.contentResolver
-        var cursor: Cursor? = null;
+        var cursor: Cursor? = null
         try {
             cursor = cr.query(
                 CalendarContract.Events.CONTENT_URI,
@@ -116,10 +119,10 @@ class CalendarUtil(private var context: Context) {
                 CalendarContract.Events.UID_2445 + " = ?",
                 arrayOf(id.toString()),
                 null
-            );
+            )
             return cursor != null && cursor.count > 0
         } finally {
-            cursor?.close();
+            cursor?.close()
         }
     }
 }
