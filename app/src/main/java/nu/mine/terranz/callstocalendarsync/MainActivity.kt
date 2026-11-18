@@ -1,11 +1,11 @@
 package nu.mine.terranz.callstocalendarsync
 
 import android.Manifest
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.provider.CalendarContract
 import android.util.Log
 import android.view.View

@@ -2,7 +2,7 @@ package nu.mine.terranz.callstocalendarsync.util
 
 import android.content.Context
 import android.database.Cursor
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.provider.CallLog
 import android.util.Log
 import android.widget.Toast
@@ -21,8 +21,8 @@ class CallsUtil {
             )
         }
         val callsUtil = CallsUtil()
-        val sp = PreferenceManager.getDefaultSharedPreferences(context)
         if (context != null) {
+            val sp = PreferenceManager.getDefaultSharedPreferences(context)
             val calls = callsUtil.getCallLogs(
                 context,
                 sp.getLong("last_sync", Calendar.getInstance().timeInMillis - 60 * 60 * 1000)

@@ -6,7 +6,8 @@ import android.database.Cursor
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.provider.CalendarContract
-import android.provider.Contacts
+import android.provider.ContactsContract.Contacts
+import android.provider.ContactsContract.PhoneLookup
 import android.util.Log
 import android.widget.Toast
 import androidx.work.Constraints
@@ -44,15 +45,8 @@ class CalendarUtil(private var context: Context) {
     fun getContactName(phoneNumber: String): String {
         val uri: Uri
         var projection: Array<String>
-        var mBaseUri = Contacts.Phones.CONTENT_FILTER_URL
-        projection = arrayOf(Contacts.People.NAME)
-        try {
-            val c = Class
-                .forName("android.provider.ContactsContract\$PhoneLookup")
-            mBaseUri = c.getField("CONTENT_FILTER_URI").get(mBaseUri) as Uri
-            projection = arrayOf("display_name")
-        } catch (e: Exception) {
-        }
+        var mBaseUri = PhoneLookup.CONTENT_FILTER_URI
+        projection = arrayOf(Contacts.DISPLAY_NAME)
 
         uri = Uri.withAppendedPath(mBaseUri, Uri.encode(phoneNumber))
         val cursor = context.contentResolver.query(uri, projection, null, null, null)
