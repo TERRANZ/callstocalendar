@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+// Kotlin is provided by AGP's built-in Kotlin Gradle Plugin (KGP 2.2.x) starting with AGP 9,
+// so the separate kotlin-android / kotlin-android-extensions plugins are no longer applied.
 
 android {
     compileSdkVersion 30
@@ -26,7 +26,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    // Kotlin stdlib is provided automatically by AGP 9's built-in Kotlin Gradle Plugin,
+    // so it is no longer declared as an explicit dependency.
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
