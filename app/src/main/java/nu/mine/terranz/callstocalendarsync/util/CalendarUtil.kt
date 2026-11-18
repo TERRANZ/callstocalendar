@@ -1,10 +1,7 @@
 package nu.mine.terranz.callstocalendarsync.util
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.preference.PreferenceManager
@@ -12,37 +9,34 @@ import android.provider.CalendarContract
 import android.provider.Contacts
 import android.util.Log
 import android.widget.Toast
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import nu.mine.terranz.callstocalendarsync.R
 import nu.mine.terranz.callstocalendarsync.entity.PhoneCall
-import nu.mine.terranz.callstocalendarsync.receiver.SyncReceiver
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 private const val CAL_ID = "cal_id"
 
 class CalendarUtil(private var context: Context) {
 
     fun setupSyncAlarm() {
-        val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(context, SyncReceiver::class.java).let { intent ->
-            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-            // API 31+ requires an explicit mutable/immutable flag on the
-            // PendingIntent; the alarm carries no extras, so immutable is correct.
-            val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            PendingIntent.getBroadcast(context, 0, intent, flags)
-        }
-
-        val calendar: Calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 0)
-        }
-        alarmMgr.cancel(alarmIntent)
-        alarmMgr.setInexactRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_HOUR,
-            alarmIntent
-        )
-        Log.i(this.javaClass.name, "Alarm set")
+        // Android 8+ alarms are batched by Doze/App Standby and inexact-repeating
+        // alarms are constrained on Android 12+. WorkManager is the reliable
+        // replacement: it reschedules itself after reboot (so BootReceiver is no
+        // longer needed) and runs SyncWorker on a background coroutine.
+        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS)
+            .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(false).build())
+            .build()
+        WorkManager.getInstance(context)
+            .enqueueUniquePeriodicWork(
+                "call-sync",
+                ExistingPeriodicWorkPolicy.KEEP,
+                syncRequest
+            )
+        Log.i(this.javaClass.name, "Sync work scheduled")
         Toast.makeText(context, "Calls list updater set", Toast.LENGTH_SHORT).show()
     }
 
