@@ -25,7 +25,10 @@ class CalendarUtil(private var context: Context) {
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, SyncReceiver::class.java).let { intent ->
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-            PendingIntent.getBroadcast(context, 0, intent, 0)
+            // API 31+ requires an explicit mutable/immutable flag on the
+            // PendingIntent; the alarm carries no extras, so immutable is correct.
+            val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.getBroadcast(context, 0, intent, flags)
         }
 
         val calendar: Calendar = Calendar.getInstance().apply {
