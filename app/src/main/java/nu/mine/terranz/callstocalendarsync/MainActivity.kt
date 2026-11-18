@@ -12,6 +12,9 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import nu.mine.terranz.callstocalendarsync.util.CalendarUtil
 import nu.mine.terranz.callstocalendarsync.util.CallsUtil
 
@@ -21,7 +24,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Edge-to-edge (forced on targetSdk 35+): let content extend under the bars.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.a_main)
+
+        // Keep the single control above the status bar on edge-to-edge devices.
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById<View>(R.id.main_root)
+        ) { view, insets ->
+            val bar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.setPadding(bar.left, bar.top, bar.right, 0)
+            insets.consumeSystemWindowInsets()
+        }
 
         CalendarUtil(this).setupSyncAlarm()
         CallsUtil().doSync(this)
