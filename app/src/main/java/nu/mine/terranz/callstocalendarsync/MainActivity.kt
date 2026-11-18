@@ -83,23 +83,20 @@ class MainActivity : AppCompatActivity() {
         val writeCal = checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
         val readCallLog = checkSelfPermission(Manifest.permission.READ_CALL_LOG)
         val readContacts = checkSelfPermission(Manifest.permission.READ_CONTACTS)
-        val internet = checkSelfPermission(Manifest.permission.INTERNET)
-        val onBoot = checkSelfPermission(Manifest.permission.RECEIVE_BOOT_COMPLETED)
 
         if (readCal != PackageManager.PERMISSION_GRANTED
             || writeCal != PackageManager.PERMISSION_GRANTED
             || readCallLog != PackageManager.PERMISSION_GRANTED
             || readContacts != PackageManager.PERMISSION_GRANTED
-            || internet != PackageManager.PERMISSION_GRANTED
-            || onBoot != PackageManager.PERMISSION_GRANTED
         ) {
+            // INTERNET and RECEIVE_BOOT_COMPLETED are normal (install-time)
+            // permissions declared in the manifest; they must not be requested
+            // at runtime. Only runtime-protected permissions go here.
             val perms = arrayOf(
                 Manifest.permission.READ_CALENDAR,
                 Manifest.permission.WRITE_CALENDAR,
                 Manifest.permission.READ_CALL_LOG,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.INTERNET,
-                Manifest.permission.RECEIVE_BOOT_COMPLETED
+                Manifest.permission.READ_CONTACTS
             )
             ActivityCompat.requestPermissions(this, perms, 1)
         }
